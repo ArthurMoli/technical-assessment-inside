@@ -59,8 +59,16 @@ async function main() {
   // Error handler (must be last)
   app.use(errorHandler);
 
-  app.listen(PORT, "0.0.0.0", () => {
+  app.listen(PORT, "0.0.0.0", async () => {
     logger.info({ port: PORT }, `ArthurBank server running on port ${PORT}`);
+
+    // Warm up client assets (CSS/JS) so the first real visit loads instantly
+    if (viteDevServer) {
+      try {
+        await fetch(`http://localhost:${PORT}/login`);
+        logger.info("Client assets warmed up");
+      } catch { /* ignore */ }
+    }
   });
 }
 
