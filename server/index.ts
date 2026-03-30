@@ -48,6 +48,12 @@ async function main() {
     ? () => viteDevServer.ssrLoadModule("virtual:remix/server-build") as any
     : await import("../build/server/index.js" as string);
 
+  // Warm up Remix in dev so the first request doesn't hit a blank page
+  if (viteDevServer) {
+    await viteDevServer.ssrLoadModule("virtual:remix/server-build");
+    logger.info("Remix dev build warmed up");
+  }
+
   app.all("*", createRequestHandler({ build: remixBuild }));
 
   // Error handler (must be last)
